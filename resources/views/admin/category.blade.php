@@ -66,7 +66,11 @@
                   </td>
                     
                     <td>
-                    <a href="{{ route('admin.deletecategory', ['id' => $data->id]) }}" class="btn btn-danger">Xóa</a>
+                      <form action="{{ route('admin.deletecategory', ['id' => $data->id]) }}" method="POST" style="display:inline;">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger">Xóa</button>
+                      </form>
                   </td>
                 </tr>
                 @endforeach

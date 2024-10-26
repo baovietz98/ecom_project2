@@ -177,6 +177,7 @@
     <p>Email: {{ $order->email }}</p>
     <p>Địa Chỉ: {{ $order->address }}</p>
     <p>Ghi Chú: {{ $order->note }}</p>
+    <p>Trạng Thái Thanh Toán: {{ $order->payment_status }}</p>
     <p>Trạng Thái: {{ $order->status }}</p>
     <p>Tổng Tiền: {{ number_format($order->total_money, 0, ',', '.') }} VND</p>
 

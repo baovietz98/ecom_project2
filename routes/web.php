@@ -50,7 +50,7 @@ Route::middleware(['auth','Admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');    
     Route::get('/admin/category', [AdminController::class, 'view_category'])->name('admin.category'); 
     Route::post('/admin/addcategory', [AdminController::class, 'add_category'])->name('admin.addcategory'); 
-    Route::get('/admin/delete_category/{id}', [AdminController::class, 'delete_category'])->name('admin.deletecategory');
+    Route::delete('/admin/delete_category/{id}', [AdminController::class, 'delete_category'])->name('admin.deletecategory');
     Route::get('/admin/edit_category/{id}', [AdminController::class, 'edit_category'])->name('admin.editcategory');
     Route::post('/admin/update_category/{id}', [AdminController::class, 'update_category'])->name('admin.updatecategory');
     Route::get('/admin/add_product', [AdminController::class, 'add_product'])->name('admin.addproduct');
@@ -62,7 +62,7 @@ Route::middleware(['auth','Admin'])->group(function () {
     Route::get('/admin/search_product', [AdminController::class, 'search_product'])->name('admin.searchproduct');
     Route::get('/admin/brands', [AdminController::class, 'view_brands'])->name('admin.brands'); 
     Route::post('/admin/addbrands', [AdminController::class, 'add_brands'])->name('admin.addbrands'); 
-    Route::get('/admin/delete_brands/{id}', [AdminController::class, 'delete_brands'])->name('admin.deletebrands');
+    Route::delete('/admin/delete_brands/{id}', [AdminController::class, 'delete_brands'])->name('admin.deletebrands');
     Route::get('/admin/edit_brands/{id}', [AdminController::class, 'edit_brands'])->name('admin.editbrands');
     Route::post('/admin/update_brands/{id}', [AdminController::class, 'update_brands'])->name('admin.updatebrands');
 
