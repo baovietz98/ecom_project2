@@ -50,6 +50,50 @@
           color: #ddd;
           padding: 5px;
         }
+        .order-details {
+          background-color: #2d2d2d;
+          padding: 10px;
+          margin-top: 10px;
+          display: none;
+        }
+
+        .btn-info {
+          margin-left: 5px;
+      }
+
+      .btn {
+          width: 150px; /* Thiết lập chiều rộng cho cả hai nút */
+          height: 40px; /* Thiết lập chiều cao cho cả hai nút */
+          padding: 0; /* Loại bỏ padding để đảm bảo kích thước chính xác */
+          margin-top: 5px; /* Khoảng cách giữa các nút */
+      }
+
+      .form-group {
+         margin: 20px 0;
+      }
+
+      .custom-select {
+          width: 250px; /* Điều chỉnh chiều rộng dropdown */
+          height: 40px; /* Điều chỉnh chiều cao */
+          font-size: 16px; /* Thay đổi kích thước font */
+          border: 1px solid #007bff; /* Đường viền màu xanh */
+          border-radius: 5px; /* Viền bo tròn */
+          padding: 0 10px; /* Thêm khoảng cách trong */
+          background-color: #f8f9fa; /* Màu nền sáng */
+          transition: border-color 0.3s ease; /* Hiệu ứng chuyển đổi khi focus */
+      }
+
+      .custom-select:focus {
+          border-color: #28a745; /* Màu viền khi focus */
+          box-shadow: 0 0 5px rgba(40, 167, 69, 0.5); /* Hiệu ứng shadow khi focus */
+      }
+
+      label {
+          font-size: 18px; /* Kích thước chữ label */
+          color: #343a40; /* Màu chữ đen */
+          font-weight: bold; /* Chữ đậm */
+      }
+      
     </style>
   </head>
   <body>
@@ -61,10 +105,20 @@
         <div class="container-fluid">
 
           <form action="{{ route('admin.searchOrder') }}" method="GET">
-            @csrf
             <input type="search" name="search" placeholder="Tìm kiếm đơn hàng">
-            <input type="submit" class="btn btn-success" value="Tìm kiếm" >
-          </form>
+            <input type="submit" class="btn btn-success" value="Tìm kiếm">
+        </form>
+
+          <form action="{{ route('admin.orders') }}" method="GET">
+            <div class="form-group">
+                <label for="status" class="font-weight-bold">Trạng thái đơn hàng</label>
+                <select name="status" id="status" class="custom-select" onchange="this.form.submit()">
+                    <option value="">Tất cả</option>
+                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Đang chờ xử lý</option>
+                    <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Đã xử lý</option>
+                </select>
+            </div>
+        </form>
 
           <div class="div_deg">
             <table class="table_deg">
@@ -85,8 +139,12 @@
                 <td>{{ $order->email }}</td>
                 <td>{{ $order->phone }}</td>
                 <td>{{ $order->address }}</td>
-                <td class="{{ $order->status == 'pending' ? 'status-pending' : 'status-shipped' }}">
-                  {{ $order->status == 'pending' ? 'Đang chờ xử lý' : 'Đã chuyển hàng' }}
+                <td>
+                  @if($order->status == 'pending')
+                  <span class="badge bg-warning" style="font-size: 1rem; font-weight: bold;">Đang chờ xử lý</span>
+                  @else
+                  <span class="badge bg-success" style="font-size: 1rem; font-weight: bold;">Đã xử lý</span>
+                  @endif
                 </td>
                 <td>{{ $order->order_date }}</td>
                 <td>
@@ -96,13 +154,14 @@
                     <button type="submit" class="btn btn-success">Xử Lý</button>
                   </form>
                   @else
-                  <span>Đã xử lý</span>
+                  <span class="badge bg-success ">Đã xử lý</span>
                   @endif
+                  <button class="btn btn-info btn-sm view-details" data-order-id="{{ $order->id }}">Xem chi tiết</button>
                 </td>
               </tr>
               <tr>
                 <td colspan="8">
-                  <div class="order-details">
+                  <div id="order-details-{{ $order->id }}" class="order-details">
                     <table class="table table-sm">
                       <tr>
                         <th>Tên Sản Phẩm</th>
@@ -125,6 +184,24 @@
               @endforeach
             </table>
           </div>
+
+                <!-- Bao gồm jQuery và script của bạn -->
+                <script src="{{ asset('admincss/vendor/jquery/jquery.min.js') }}"></script>
+                <script>
+                  $(document).ready(function() {
+                      $('.view-details').click(function() {
+                          var orderId = $(this).data('order-id');
+                          $('#order-details-' + orderId).toggle();
+                  
+                          // Thay đổi chữ trên nút
+                          if ($('#order-details-' + orderId).is(':visible')) {
+                              $(this).text('Ẩn chi tiết');
+                          } else {
+                              $(this).text('Xem chi tiết');
+                          }
+                      });
+                  });
+                  </script>
 
           <div class="div_deg">
             {{ $orders->onEachSide(1)->links() }}

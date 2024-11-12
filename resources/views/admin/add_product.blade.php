@@ -67,7 +67,7 @@
 
                     <div class="input_deg">
                         <label>Giá</label>
-                        <input type="number" name="price" required>
+                        <input type="number" name="price" min="0" required>
                     </div>
 
                     <div class="input_deg">

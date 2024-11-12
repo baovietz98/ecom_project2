@@ -82,6 +82,11 @@
         color: #fff; /* Màu chữ khi hover */
         border-radius: 5px; /* Làm góc tròn */
     }
+    .pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    }
   </style>
 </head>
 
@@ -165,7 +170,8 @@
 
   <div class="order-history">
     <h2>Lịch Sử Đặt Hàng</h2>
-    <table>
+    <div class="table-responsive"> <!-- Sử dụng lớp table-responsive để làm bảng phản hồi -->
+    <table class="table table-bordered">
       <thead>
         <tr>
           <th>ID Đơn Hàng</th>
@@ -183,7 +189,13 @@
           <td>{{ $order->order_date }}</td>
           <td>{{ $order->fullname }}</td>
           <td>{{ $order->email }}</td>
-          <td>{{ $order->status }}</td>
+          <td>
+            @if($order->status == 'pending')
+              <span class="badge bg-warning">Đang xử lý</span>
+            @else($order->status == 'completed')
+              <span class="badge bg-success">Đã xử lý</span>
+            @endif
+          </td>
           <td>
             <a href="{{ route('order.details', $order->id) }}">Xem Chi Tiết</a>
           </td>
@@ -191,6 +203,11 @@
         @endforeach
       </tbody>
     </table>
+    </div>
+       <!-- Hiển thị liên kết phân trang -->
+        <div class="pagination">
+          {{ $orders->links() }}
+      </div>
   </div>
 
   <!-- info section -->

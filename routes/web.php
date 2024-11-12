@@ -76,13 +76,19 @@ Route::middleware(['auth','Admin'])->group(function () {
     Route::post('/admin/orders/update-status/{id}', [AdminController::class, 'updateOrderStatus'])->name('admin.updateOrderStatus');
 
     // Route để tìm kiếm đơn hàng
-    Route::get('/admin/orders/search', [AdminController::class, 'searchOrder'])->name('admin.searchOrder');
+    Route::get('/admin/search_orders', [AdminController::class, 'searchOrder'])->name('admin.searchOrder');
 
     Route::get('/admin/addnews', [AdminController::class, 'add_news'])->name('admin.addnews');
 
     Route::post('/admin/uploadnews', [AdminController::class, 'upload_news'])->name('admin.uploadnews');
 
+    Route::get('/admin/users', [AdminController::class, 'view_users'])->name('admin.users');
 
+    Route::post('/admin/users/update/{id}', [AdminController::class, 'update_user'])->name('admin.updateuser');
+
+    Route::get('/admin/feedback', [AdminController::class, 'view_feedback'])->name('admin.feedback');
+
+    Route::post('/admin/feedback/update/{id}', [AdminController::class, 'update_feedback'])->name('admin.updatefeedback');
 
 });
 require __DIR__.'/auth.php';

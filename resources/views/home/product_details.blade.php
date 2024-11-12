@@ -94,11 +94,11 @@
             </div>
 
             <div class="detail-box">
-              <h6 class="price">Tình Trạng: 
+              <h6>Tình Trạng: 
                 @if($product->quantity >= 1)
-                  <span>Còn hàng</span>
+                <span class="badge bg-success" style="color: white;">Còn hàng</span>
                 @else
-                  <span>Hết hàng</span>
+                <span class="badge bg-danger" style="color: white;">Hết hàng</span>
                 @endif
               </h6>
             </div>

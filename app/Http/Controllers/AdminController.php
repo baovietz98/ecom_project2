@@ -10,6 +10,7 @@ use App\Models\Order;
 use App\Models\Image;
 use App\Models\News;
 use App\Models\User;
+use App\Models\Feedback;
 
 class AdminController extends Controller
 {
@@ -110,7 +111,7 @@ class AdminController extends Controller
         return redirect()->back();
     }
     public function view_product(){
-        $data = Product::with('brand')->paginate(5);
+        $data = Product::with(['brand', 'category'])->paginate(5);
         return view('admin.view_product',compact('data'));
     }
     public function delete_product(Request $request){
@@ -198,10 +199,23 @@ class AdminController extends Controller
         return redirect()->route('admin.brands');
     }
 
-    public function viewOrders() {
-        // Lấy danh sách các đơn hàng từ cơ sở dữ liệu
-        $orders = Order::paginate(10); // Sử dụng phân trang
-        return view('admin.orders', compact('orders'));
+    public function viewOrders(Request $request) {
+        // Lấy trạng thái từ request (nếu có)
+        $status = $request->input('status');
+
+        // Lấy danh sách các đơn hàng từ cơ sở dữ liệu, hỗ trợ lọc theo trạng thái
+        $ordersQuery = Order::query();
+
+        // Nếu có trạng thái thì lọc theo trạng thái đó
+        if ($status) {
+            $ordersQuery->where('status', $status);
+        }
+
+        // Phân trang kết quả
+        $orders = $ordersQuery->paginate(5);
+
+        // Truyền danh sách đơn hàng vào view
+        return view('admin.orders', compact('orders', 'status'));
     }
     
     public function orderDetails($id) {
@@ -211,7 +225,7 @@ class AdminController extends Controller
     }
     
     public function updateOrderStatus($id) {
-        // Cập nhật trạng thái đơn hàng thành "shipped"
+        // Cập nhật trạng thái đơn hàng thành "completed"
         $order = Order::findOrFail($id);
         $order->status = 'completed';
         $order->save();
@@ -220,11 +234,11 @@ class AdminController extends Controller
     }
     
     public function searchOrder(Request $request) {
-        $search = $request->input('search');
-        $orders = Order::where('fullname', 'LIKE', "%$search%")
-                       ->orWhere('email', 'LIKE', "%$search%")
-                       ->paginate(10);
-        
+        $search = $request->search;
+        $orders = Order::where('fullname', 'like', '%' . $search . '%')
+                       ->orWhere('email', 'like', '%' . $search . '%')
+                       ->paginate(5);
+    
         return view('admin.orders', compact('orders'));
     }
 
@@ -258,4 +272,43 @@ class AdminController extends Controller
     return redirect()->back();
     }
 
+    public function view_users (){
+        $data = User::paginate(5);
+        return view('admin.users',compact('data'));
+    }
+
+    public function update_user(Request $request, $id){
+        $user = User::find($id);
+        if($user){
+            $user->role_type = $request->input('role_type');
+            $user->save();
+            toastr()->timeOut(10000)->closeButton()->addSuccess('Cập nhật thành công');
+            return redirect()->back();
+        }
+        // Nếu không tìm thấy người dùng, trả về lỗi 404 hoặc thông báo khác
+        return redirect()->back()->withErrors('User not found');
+    }
+
+    public function view_feedback(){
+        $data = Feedback::paginate(5);
+        return view('admin.feedback',compact('data'));
+    }
+
+    public function update_feedback(Request $request, $id){
+         // Tìm feedback theo ID
+        $data = Feedback::find($id);
+
+        if ($data) {
+            // Cập nhật status thành 1 (Đang xử lý)
+            $data->status = 1;
+            $data->save();
+
+            toastr()->success('Đã thay đổi trạng thái thành "Đang xử lý"');
+        } else {
+            toastr()->error('Không tìm thấy feedback');
+        }
+
+        // Quay lại trang feedbacks
+        return redirect()->route('admin.feedback');
+    }
 }

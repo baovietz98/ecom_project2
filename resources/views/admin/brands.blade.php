@@ -17,7 +17,7 @@
             width: 600px;
         }
         th {
-            background-color: skyblue;
+            background-color: #007bff;
             padding: 15px;
             font-size: 20px;
             font-weight: bold;
@@ -25,7 +25,7 @@
         }
         td {
             padding: 10px;
-            border: 1px solid skyblue;
+            border: 1px solid #007bff;
             color: white;
         }
         
@@ -44,7 +44,7 @@
                     @csrf
                     <div>
                         <input type="text" name="name" placeholder="Tên hãng" required>
-                        <input class="btn btn-primary" type="submit" value="Thêm hãng">
+                        <input class="btn btn-success" type="submit" value="Thêm hãng">
                     </div>
                 </form>                
             </div>
@@ -62,7 +62,7 @@
                   <td>{{ $data->name }}</td>
 
                   <td>
-                    <a href="{{ route('admin.editbrands', ['id' => $data->id]) }}" class="btn btn-success">Sửa</a>
+                    <a href="{{ route('admin.editbrands', ['id' => $data->id]) }}" class="btn btn-warning">Sửa</a>
                   </td>
                     
                     <td>

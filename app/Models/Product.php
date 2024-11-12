@@ -27,4 +27,9 @@ class Product extends Model
     {
         return $this->hasMany(Image::class); // Giả sử rằng 'Image' là mô hình hình ảnh của bạn
     }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
 }

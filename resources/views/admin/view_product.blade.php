@@ -13,14 +13,14 @@
           border: 2px solid greenyellow;
         }
         th{
-          background-color: skyblue;
+          background-color: #007bff;
           color: white;
           font-size: 19px;
           font-weight: bold;
           padding: 15px;
         }
         td{
-          border: 1px solid skyblue;
+          border: 1px solid #007bff;
           text-align: center;
           color: white;
         }
@@ -28,7 +28,7 @@
           width: 300px;
           height: 39px;
           border-radius: 5px;
-          border: 1px solid skyblue;
+          border: 1px solid #007bff;
           padding: 5px;
           margin-top: 20px;
         }
@@ -53,7 +53,11 @@
               <table class="table_deg">
 
                 <tr>
+                  <th>ID sản phẩm</th>
+
                   <th>Tên sản phẩm</th>
+
+                  <th>Danh mục</th>
 
                   <th>Tên hãng</th> <!-- Thêm cột cho tên hãng -->
 
@@ -63,7 +67,7 @@
 
                   <th>Số lượng</th>
 
-                  <th>Mô tả</th>
+                  {{-- <th>Mô tả</th> --}}
 
                   <th>Hình ảnh</th>
 
@@ -73,24 +77,30 @@
                 </tr>
                   @foreach ($data as $product)
                   <tr>
+                    <td>{{ $product->id }}</td>
+
                     <td>{{ $product->title }}</td>
+
+                    <td>
+                      {{ $product->category ? $product->category->name : 'Không có' }} <!-- Hiển thị tên danh mục -->
+                    </td>
 
                     <td>{{ $product->brand ? $product->brand->name : 'Không có' }}</td> <!-- Hiển thị tên hãng -->
                     
                     <td>{{ $product->product_code }}</td> <!-- Hiển thị mã sản phẩm -->
   
-                    <td>{{ $product->price }}</td>
+                    <td>{{ number_format($product->price, 0, ',', '.') }} ₫</td>
   
                     <td>{{ $product->quantity }}</td>
   
-                    <td>{!!Str::limit($product->description,50)!!}</td>
+                    {{-- <td>{!!Str::limit($product->description,50)!!}</td> --}}
   
                     <td>
                       <img height="150" width="150" src="{{ asset('products/' . $product->thumbnail) }}">
                     </td>
 
                     <td>
-                      <a href="{{ route('admin.updateproduct',$product->id) }}" class="btn btn-success">Sửa</a>
+                      <a href="{{ route('admin.updateproduct',$product->id) }}" class="btn btn-warning">Sửa</a>
                     </td>
 
                     <td>

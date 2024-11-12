@@ -206,8 +206,11 @@ class HomeController extends Controller
 }
     public function myOrders()
     {
-        // Lấy tất cả đơn hàng của người dùng với chi tiết sản phẩm
-        $orders = Order::where('user_id', Auth::id())->with('orderDetails.product')->get();
+        /// Lấy tất cả đơn hàng của người dùng, sắp xếp theo ngày đặt giảm dần và phân trang
+        $orders = Order::where('user_id', Auth::id())
+        ->with('orderDetails.product')
+        ->orderBy('order_date', 'desc')
+        ->paginate(5);
         
         // Kiểm tra người dùng đã đăng nhập chưa và lấy số lượng sản phẩm trong giỏ hàng
         $count = 0;

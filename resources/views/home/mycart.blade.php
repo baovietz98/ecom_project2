@@ -241,7 +241,7 @@
                     <button type="submit" class="btn btn-secondary">-</button>
                 </form>
     
-                <span style="margin: 0 10px;">{{ $cart->quantity }}</span>
+                <span  style="margin: 0 10px;">{{ $cart->quantity }}</span>
     
                 <form action="{{ url('update_cart_quantity', $cart->id) }}" method="POST" style="margin-left: 5px;">
                     @csrf

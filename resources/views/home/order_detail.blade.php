@@ -171,15 +171,27 @@
     <h2>Chi Tiết Đơn Hàng</h2>
 
     <h3>Thông Tin Đơn Hàng</h3>
-    <p>ID Đơn Hàng: {{ $order->id }}</p>
-    <p>Ngày Đặt: {{ $order->order_date }}</p>
-    <p>Họ Tên: {{ $order->fullname }}</p>
-    <p>Email: {{ $order->email }}</p>
-    <p>Địa Chỉ: {{ $order->address }}</p>
-    <p>Ghi Chú: {{ $order->note }}</p>
-    <p>Trạng Thái Thanh Toán: {{ $order->payment_status }}</p>
-    <p>Trạng Thái: {{ $order->status }}</p>
-    <p>Tổng Tiền: {{ number_format($order->total_money, 0, ',', '.') }} VND</p>
+    <p><strong>ID Đơn Hàng:</strong> {{ $order->id }}</p>
+    <p><strong>Ngày Đặt:</strong> {{ $order->order_date }}</p>
+    <p><strong>Họ Tên:</strong> {{ $order->fullname }}</p>
+    <p><strong>Email:</strong> {{ $order->email }}</p>
+    <p><strong>Địa Chỉ:</strong> {{ $order->address }}</p>
+    <p><strong>Ghi Chú:</strong> {{ $order->note }}</p>
+    <p><strong>Trạng Thái Thanh Toán:</strong>
+      @if($order->payment_status == 'cash on delivery')
+        <span class="badge bg-warning">Chưa thanh toán</span>
+      @else($order->payment_status == 'paid')
+        <span class="badge bg-success">Đã thanh toán</span>
+      @endif
+    </p>
+    <p><strong>Trạng Thái:</strong> 
+      @if($order->status == 'pending')
+        <span class="badge bg-warning">Đang xử lý</span>
+      @else($order->status == 'completed')
+        <span class="badge bg-success">Đã xử lý</span>
+      @endif
+    </p>
+    <p><strong>Tổng Tiền:</strong> {{ number_format($order->total_money, 0, ',', '.') }} VND</p>
 
     <h3>Chi Tiết Sản Phẩm</h3>
     <table>
