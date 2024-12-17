@@ -25,4 +25,18 @@ class Order extends Model
     {
         return $this->hasMany(OrderDetail::class, 'order_id', 'id'); // order_id là khóa ngoại trong bảng order_details
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public static function boot()
+    {
+    parent::boot();
+
+    static::deleting(function ($order) {
+        $order->orderDetails()->delete(); // Xóa tất cả chi tiết đơn hàng
+    });
+    }   
 }

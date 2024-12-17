@@ -20,14 +20,16 @@
             width: 350px;
             height: 50px;
         }
-        textarea{
-            width: 450px;
-            height: 80px;
-        }
+        
         .input_deg{
             padding: 15px;
         }
+
+        .ck-editor__editable_inline {
+                height: 500px;
+            }
     </style>
+      <script src="https://cdn.ckeditor.com/ckeditor5/34.2.0/classic/ckeditor.js"></script>
   </head>
   <body>
     @include('admin.header')
@@ -87,7 +89,7 @@
 
                     <div class="input_deg">
                         <label>Mô tả</label>
-                        <textarea name="description" required></textarea>
+                        <textarea name="description" id="description"></textarea>
                     </div>
 
                     <div class="input_deg">
@@ -110,9 +112,22 @@
     <script src="{{ asset('admincss/vendor/popper.js/umd/popper.min.js') }}"> </script>
     <script src="{{ asset('admincss/vendor/bootstrap/js/bootstrap.min.js') }}"></script>
     <script src="{{ asset('admincss/vendor/jquery.cookie/jquery.cookie.js') }}"> </script>
-    <script src="{{ asset('admincss/vendor/chart.js/Chart.min.js') }}"></script>
+    
     <script src="{{ asset('admincss/vendor/jquery-validation/jquery.validate.min.js') }}"></script>
-    <script src="{{ asset('admincss/js/charts-home.js') }}"></script>
+    
     <script src="{{ asset('admincss/js/front.js') }}"></script>
+
+    {{-- <script src="https://cdn.ckeditor.com/4.16.0/standard/ckeditor.js"></script> --}}
+    <script>
+        ClassicEditor
+            .create(document.querySelector('#description'), {
+                ckfinder: {
+                    uploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+                }
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    </script>
   </body>
 </html>

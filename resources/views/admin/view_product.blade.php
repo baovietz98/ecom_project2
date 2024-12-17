@@ -24,14 +24,7 @@
           text-align: center;
           color: white;
         }
-        input[type="search"]{
-          width: 300px;
-          height: 39px;
-          border-radius: 5px;
-          border: 1px solid #007bff;
-          padding: 5px;
-          margin-top: 20px;
-        }
+        
     </style>
   </head>
   <body>
@@ -42,12 +35,13 @@
         <div class="page-header">
           <div class="container-fluid">
 
-            <form action="{{ route('admin.searchproduct') }}" method="GET" >
+            <nav class="navbar navbar-light bg-light">
+            <form class="form-inline" action="{{ route('admin.searchproduct') }}" method="GET" >
               @csrf
-              <input type="search"name="search">
-              <input type="submit" class="btn btn-success" value="Tìm kiếm" >
+              <input class="form-control mr-sm-2" type="search" placeholder="Tìm kiếm sản phẩm" aria-label="Search" name="search">
+              <input type="submit" class="btn btn-outline-success my-2 my-sm-0" value="Tìm kiếm" >
             </form>
-
+            </nav>
             <div class="div_deg">
 
               <table class="table_deg">

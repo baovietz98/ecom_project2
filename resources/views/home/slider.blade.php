@@ -14,7 +14,7 @@
                     <p>
                       Chúng tôi cung cấp một loạt các sản phẩm gear chất lượng cao, từ bàn phím, chuột đến tai nghe, giúp bạn nâng cao trải nghiệm chơi game và làm việc. Khám phá các sản phẩm tốt nhất với giá cả hợp lý. Hãy để chúng tôi hỗ trợ bạn tìm kiếm thiết bị phù hợp nhất cho nhu cầu của bạn.
                     </p>
-                    <a href="">
+                    <a href="{{ route('feedback') }}">
                       Liên Hệ Chúng Tôi
                     </a>
                   </div>

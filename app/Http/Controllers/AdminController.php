@@ -11,7 +11,9 @@ use App\Models\Image;
 use App\Models\News;
 use App\Models\User;
 use App\Models\Feedback;
-
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\ProductImport;
+use App\Exports\ProductExport;
 class AdminController extends Controller
 {
     public function index(){
@@ -134,6 +136,7 @@ class AdminController extends Controller
         $data->description = $request->description;
         $data->price = $request->price;
         $data->quantity = $request->quantity;
+        $data->discount = $request->discount;
 
         $thumbnail = $request->thumbnail;
         if ($thumbnail) {
@@ -158,10 +161,16 @@ class AdminController extends Controller
     public function search_product(Request $request) {
         $search = $request->search;
         
-        // Tìm kiếm theo title hoặc product_code
-        $data = Product::where('title', 'like', '%' . $search . '%')
-            ->orWhere('product_code', 'like', '%' . $search . '%')
-            ->paginate(5);
+        // Kiểm tra xem tìm kiếm có phải là số (id sản phẩm)
+        if (is_numeric($search)) {
+            $data = Product::where('id', '=', $search)
+                ->paginate(5);
+        } else {
+            // Nếu không phải là số, tìm kiếm theo title hoặc product_code
+            $data = Product::where('product_code', 'like', '%' . $search . '%')
+                ->orWhere('title', 'like', '%' . $search . '%')
+                ->paginate(5);
+        }
     
         return view('admin.view_product', compact('data'));
     }
@@ -311,4 +320,41 @@ class AdminController extends Controller
         // Quay lại trang feedbacks
         return redirect()->route('admin.feedback');
     }
+
+    public function import(Request $request){
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv|max:2048',
+        ]);
+    
+        try {
+            Excel::import(new ProductImport, $request->file('file'));
+            return redirect()->back()->with('success', 'Import thành công');
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['error' => 'Import thất bại: ' . $e->getMessage()]);
+        }
+    }
+
+    public function importProduct(){
+        return view('admin.import_product');
+    }
+
+    public function export(){
+        return Excel::download(new ProductExport, 'products.xlsx');
+    }
+
+    public function upload(Request $request)
+    {
+       if ($request->hasFile('upload')) {
+            $originName = $request->file('upload')->getClientOriginalName();
+            $fileName = pathinfo($originName, PATHINFO_FILENAME);
+            $extension = $request->file('upload')->getClientOriginalExtension();
+            $fileName = $fileName . '_' . time() . '.' . $extension;
+
+            $request->file('upload')->move(public_path('media'), $fileName);
+
+            $url = asset('media/' . $fileName);
+            return response()->json(['fileName' => $fileName, 'uploaded'=> 1, 'url' => $url]);
+        }
+    }
+
 }

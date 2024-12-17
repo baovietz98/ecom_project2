@@ -13,14 +13,40 @@
                             </div>
                             <div class="detail-box">
                                 <a href="{{ url('product_details', $keyboard->id) }}">
-                                    <h6>{{ Str::limit($keyboard->title, 40) }}</h6>
-                                </a>
+                                  <h6>{{ Str::limit($keyboard->title, 40) }}</h6>
+                              </a>
+                                <!-- Hiển thị thương hiệu sản phẩm -->
                                 <h6 class="price">Thương hiệu: <span>{{ $keyboard->brand->name }}</span></h6> 
-                                <h6 class="price">Giá: <span>{{ number_format($keyboard->price, 0, ',', '.') }}đ</span></h6>
+                                <!-- Hiển thị giá và giảm giá -->
+                                <div class="price-section">
+                                  @if($keyboard->discount > 0)
+                                      <!-- Giá gốc -->
+                                      <h6 class="original-price text-muted text-decoration-line-through">
+                                          {{ number_format($keyboard->price, 0, ',', '.') }}đ
+                                      </h6>
+                                      <!-- Giá sau khi giảm và phần trăm giảm giá -->
+                                      <h5 class="discounted-price text-danger fw-bold">
+                                        {{ number_format($keyboard->price * (1 - $keyboard->discount), 0, ',', '.') }}đ
+                                        <span class="discount-badge">-{{ $keyboard->discount * 100 }}%</span>
+                                      </h5>
+                                  @else
+                                      <!-- Giá không giảm -->
+                                      <h5 class="normal-price text-dark fw-bold">
+                                          {{ number_format($keyboard->price, 0, ',', '.') }}đ
+                                      </h5>
+                                  @endif
+                              </div>
                             </div>
-                            <div>
-                                <a class="btn btn-danger" href="{{ url('product_details', $keyboard->id) }}" style="padding: 10px 20px; font-size: 16px;">Details</a>
-                                <a href="{{ url('add_cart', $keyboard->id) }}" class="btn btn-success" style="padding: 10px 20px; font-size: 16px;">Add to cart </a>
+                            <div class="d-flex justify-content-between mt-3">
+                                <!-- Nút Details -->
+                                <a href="{{ url('product_details', $keyboard->id) }}" class="btn btn-details">
+                                    <i class="fas fa-info-circle"></i> View Details
+                                </a>
+                            
+                                <!-- Nút Add to Cart -->
+                                <a href="{{ url('add_cart', $keyboard->id) }}" class="btn btn-add-to-cart">
+                                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -30,7 +56,7 @@
             @endif
         </div>
         <div class="text-center mt-3">
-            <a href="{{ url('category/1') }}" class="btn btn-primary">Xem thêm Bàn Phím</a>
+            <a href="{{ route('category.show','Bàn phím') }}" class="btn btn-primary">Xem thêm Bàn Phím</a>
         </div>
     </div>
 </section>

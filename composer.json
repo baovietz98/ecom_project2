@@ -9,6 +9,7 @@
         "guzzlehttp/guzzle": "^7.9",
         "laravel/framework": "^11.9",
         "laravel/tinker": "^2.9",
+        "maatwebsite/excel": "^3.1",
         "php-flasher/flasher-toastr-laravel": "^2.0",
         "php-flasher/flasher-toastr-symfony": "^2.0",
         "stripe/stripe-php": "^16.1"

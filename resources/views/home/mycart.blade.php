@@ -87,17 +87,20 @@
     .order_form button {
       width: 100%;
       padding: 10px;
-      background-color: #007bff;
-      color: #fff;
+      background-color: #FEC401;
+      color: #000; /* Màu chữ đen */
       border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 16px;
-      transition: background-color 0.3s;
+      border-radius: 25px; /* Bo tròn giống nút thanh toán thẻ */
+      padding: 10px 20px;
+      font-weight: bold;
+      text-decoration: none;
+      transition: background-color 0.3s ease; /* Hiệu ứng hover */
     }
 
     .order_form button:hover {
-      background-color: #0056b3; /* Màu khi hover */
+      background-color: #E3AC00; /* Màu hover vàng cam đậm */
+      text-decoration: none;
+      cursor: pointer;
     }
     .cart_value {
       margin-bottom: 70px;
@@ -117,22 +120,31 @@
         border-radius: 5px; /* Làm góc tròn */
     }
     
-    .btn-success {
-        display: inline-block;
-        width: 100%;
-        padding: 10px;
-        color: #fff;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        text-align: center;
-        font-size: 16px;
-        transition: background-color 0.3s;
+    .btn-checkout {
+      width: 100%; /* Chiều rộng nút */
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #B2FCE4; /* Màu cam tương tự Amazon */
+      color: #000; 
+      border: none; /* Bỏ viền */
+      border-radius: 25px; /* Bo tròn nút */
+      padding: 10px 20px; /* Khoảng cách trong nút */
+      font-size: 16px; /* Kích thước chữ */
+      font-weight: bold; /* Chữ đậm */
+      text-decoration: none; /* Bỏ gạch chân */
+      transition: background-color 0.3s ease; /* Hiệu ứng hover */
     }
 
-    .btn-success:hover {
-      background-color: #218838; /* Màu nền khi hover */
-      color: #fff; /* Màu chữ khi hover */
+    .btn-checkout i {
+      margin-right: 10px; /* Khoảng cách giữa icon và chữ */
+      font-size: 18px; /* Kích thước icon */
+    }
+
+    .btn-checkout:hover {
+      background-color: #91E5C9; /* Hover màu xanh ngọc đậm hơn */
+      text-decoration: none; /* Bỏ gạch chân khi hover */
+      cursor: pointer;
     }
   </style>
 </head>
@@ -249,8 +261,16 @@
                     <button type="submit" class="btn btn-secondary">+</button>
                 </form>
             </div>
-        </td>
-          <td>{{ number_format($cart->product->price, 0, ',', '.') }}</td>
+          </td>
+            <td>
+              @if($cart->product->discount > 0)
+                  <span class="text-danger fw-bold">
+                      {{ number_format($cart->product->price * (1 - $cart->product->discount), 0, ',', '.') }}đ
+                  </span>
+              @else
+                  {{ number_format($cart->product->price, 0, ',', '.') }}đ
+              @endif
+          </td>
           <td>
             <img width="150" src="/products/{{ $cart->product->thumbnail }}" alt="">
           </td>
@@ -259,7 +279,9 @@
           </td>
         </tr>
         <?php
-          $total += $cart->product->price*$cart->quantity;
+        $total += $cart->quantity * ($cart->product->discount > 0 
+          ? ($cart->product->price * (1 - $cart->product->discount)) 
+          : $cart->product->price);
         ?>
         @endforeach
         
@@ -298,9 +320,9 @@
         <div>
           <button type="submit" {{ $cart->count() === 0 ? 'disabled' : '' }}>THANH TOÁN KHI NHẬN</button>
       </div>
-      <a class="btn btn-success" href="{{ $cart->count() === 0 ? '#' : url('stripe', $total) }}" 
+      <a class="btn btn-checkout" href="{{ $cart->count() === 0 ? '#' : url('stripe', $total) }}" 
           onclick="{{ $cart->count() === 0 ? 'event.preventDefault(); alert(\'Giỏ hàng trống. Vui lòng thêm sản phẩm trước khi thanh toán.\');' : '' }}">
-          THANH TOÁN THẺ
+          <i class="fas fa-credit-card"></i>THANH TOÁN THẺ
       </a>
       </form>
     </div>

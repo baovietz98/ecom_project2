@@ -29,8 +29,9 @@ Route::get('/shop', [HomeController::class, 'shop'])->name('shop');
 Route::get('/why-us', [HomeController::class, 'whyUs'])->name('why-us');
 Route::get('/feedback', [HomeController::class, 'feedback'])->name('feedback');
 Route::post('/feedback/submit', [HomeController::class, 'store'])->name('feedback.submit');
-
-
+Route::get('/category/{name}', [HomeController::class, 'show'])->name('category.show');
+Route::post('/cancel-order/{id}', [HomeController::class, 'cancelOrder'])->name('order.cancel');
+Route::get('/search', [HomeController::class, 'search_results'])->name('search.results');
 
 
 // Route::get('/dashboard', function () {
@@ -89,6 +90,9 @@ Route::middleware(['auth','Admin'])->group(function () {
     Route::get('/admin/feedback', [AdminController::class, 'view_feedback'])->name('admin.feedback');
 
     Route::post('/admin/feedback/update/{id}', [AdminController::class, 'update_feedback'])->name('admin.updatefeedback');
+    Route::get('/admin/importProduct', [AdminController::class, 'importProduct'])->name('admin.import');
+    Route::post('/admin/importProducts', [AdminController::class, 'import'])->name('admin.importProduct');
+    Route::post('ckeditor/upload', [AdminController::class, 'upload'])->name('ckeditor.upload');
 
 });
 require __DIR__.'/auth.php';

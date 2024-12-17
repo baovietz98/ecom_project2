@@ -99,6 +99,8 @@
   <!-- end hero area -->
 
   <!-- shop section -->
+  @include('components.breadcrumb', ['breadcrumbs' => $breadcrumbs])
+
 
   <section class="why_section layout_padding">
     <div class="container">
@@ -199,10 +201,10 @@
             </div>
             <div class="detail-box">
               <h5>
-                Fast Delivery
+                Giao hàng nhanh
               </h5>
               <p>
-                variations of passages of Lorem Ipsum available
+                Chúng tôi cam kết giao hàng trong thời gian sớm nhất.
               </p>
             </div>
           </div>
@@ -314,10 +316,10 @@
             </div>
             <div class="detail-box">
               <h5>
-                Free Shiping
+                Miễn phí vận chuyển
               </h5>
               <p>
-                variations of passages of Lorem Ipsum available
+                Miễn phí giao hàng cho mọi đơn hàng đủ điều kiện.
               </p>
             </div>
           </div>
@@ -335,10 +337,10 @@
             </div>
             <div class="detail-box">
               <h5>
-                Best Quality
+                Chất lượng tốt nhất
               </h5>
               <p>
-                variations of passages of Lorem Ipsum available
+                Chúng tôi mang đến sự hài lòng qua từng món hàng.
               </p>
             </div>
           </div>

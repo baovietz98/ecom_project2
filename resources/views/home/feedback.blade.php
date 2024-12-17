@@ -97,7 +97,7 @@
           </header>
     <!-- end header section -->
     <!-- category section -->
-         
+    @include('components.breadcrumb', ['breadcrumbs' => $breadcrumbs]) 
        
   </div>
   <!-- end hero area -->

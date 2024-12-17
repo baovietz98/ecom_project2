@@ -16,7 +16,7 @@
       padding: 20px;
       border-radius: 8px;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      max-width: 800px;
+      max-width: 1000px;
       margin: 20px auto;
     }
 
@@ -63,8 +63,8 @@
     }
 
     .btn {
-      background-color: #007bff;
-      color: white;
+      margin-bottom: 10px;
+      color: black;
       padding: 10px 15px;
       border: none;
       border-radius: 5px;
@@ -72,9 +72,7 @@
       transition: background-color 0.3s;
     }
 
-    .btn:hover {
-      background-color: #0056b3;
-    }
+    
     .nav-item a {
         color: #000; /* Màu chữ ban đầu */
         padding: 10px;
@@ -166,6 +164,7 @@
     <!-- end header section -->
   </div>
   <!-- end hero area -->
+  @include('components.breadcrumb', ['breadcrumbs' => $breadcrumbs])
 
   <div class="order-detail">
     <h2>Chi Tiết Đơn Hàng</h2>
@@ -193,6 +192,24 @@
     </p>
     <p><strong>Tổng Tiền:</strong> {{ number_format($order->total_money, 0, ',', '.') }} VND</p>
 
+    
+    <div class="order">
+        @if ($order->status === 'pending')
+            <form action="{{ route('order.cancel', $order->id) }}" method="POST">
+                @csrf
+                <button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-times-circle"></i>
+                   Hủy đơn hàng
+                </button>
+            </form>
+        @else
+        <button type="button" class="btn btn-danger btn-sm" disabled>
+          <i class="fas fa-times-circle"></i> Hủy đơn hàng
+      </button>
+        @endif
+    </div>
+    
+    
+
     <h3>Chi Tiết Sản Phẩm</h3>
     <table>
       <thead>
@@ -200,27 +217,38 @@
           <th>Tên Sản Phẩm</th>
           <th>Số Lượng</th>
           <th>Giá</th>
+          <th>Giảm Giá</th>
           <th>Tổng Tiền</th>
         </tr>
       </thead>
       <tbody>
         @foreach ($order->orderDetails as $detail)
         <tr>
-          <td>
-            <a href="{{ route('product.details', $detail->product->id) }}">
-              {{ $detail->product->title }}
-            </a>
-          </td>
-          <td>{{ $detail->num }}</td>
-          <td>{{ number_format($detail->price, 0, ',', '.') }} VND</td>
-          <td>{{ number_format($detail->total_money, 0, ',', '.') }} VND</td>
+            <td>
+                <a href="{{ route('product.details', $detail->product->id) }}">
+                    {{ $detail->product->title }}
+                </a>
+            </td>
+            <td>{{ $detail->num }}</td>
+            <td>{{ number_format($detail->price, 0, ',', '.') }} VND</td>
+            <td>
+                @if($detail->product->discount > 0)
+                    -{{ number_format($detail->product->price * $detail->num * $detail->product->discount, 0, ',', '.') }} VND
+                    <span class="badge bg-success" style="color: white;">
+                        -{{ $detail->product->discount * 100 }}%
+                    </span>
+                @else
+                    0 VND
+                @endif
+            </td>
+            <td>{{ number_format($detail->total_money, 0, ',', '.') }} VND</td>
         </tr>
         @endforeach
-      </tbody>
+    </tbody>
     </table>
 
     <div class="back-button">
-      <a href="{{ route('my.orders') }}" class="btn btn-secondary">Quay Lại Lịch Sử Đặt Hàng</a>
+      <a href="{{ route('my.orders') }}" class="btn btn-danger btn-sm">Quay Lại Lịch Sử Đặt Hàng</a>
     </div>
   </div>
 

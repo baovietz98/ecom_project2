@@ -94,9 +94,9 @@
             </nav>
           </header>
     <!-- end header section -->
+    @include('components.breadcrumb', ['breadcrumbs' => $breadcrumbs])
     <!-- category section -->
           @include('home.category')
-       
   </div>
   <!-- end hero area -->
 

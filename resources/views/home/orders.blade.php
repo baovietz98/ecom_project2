@@ -167,7 +167,7 @@
     <!-- end header section -->
   </div>
   <!-- end hero area -->
-
+  @include('components.breadcrumb', ['breadcrumbs' => $breadcrumbs])
   <div class="order-history">
     <h2>Lịch Sử Đặt Hàng</h2>
     <div class="table-responsive"> <!-- Sử dụng lớp table-responsive để làm bảng phản hồi -->

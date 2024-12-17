@@ -24,6 +24,10 @@
               <li>
                 <a href="{{ route('admin.brands') }}"> <i class="bi bi-shop"></i>Hãng</a>
               </li>
+
+              <li>
+                <a href="{{ route('admin.import') }}"> <i class="bi bi-shop"></i>Import sản phẩm</a>
+              </li>
               
               <li><a href="#exampledropdownDropdown" aria-expanded="false" data-toggle="collapse"> <i class="bi bi-box"></i>Sản phẩm</a>
                 <ul id="exampledropdownDropdown" class="collapse list-unstyled ">

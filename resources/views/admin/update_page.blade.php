@@ -23,7 +23,12 @@
         width: 500px;
         height: 50px;
     }
+    .ck-editor__editable_inline {
+                height: 500px;
+            }
     </style>
+    <!-- CKEditor -->
+    <script src="https://cdn.ckeditor.com/ckeditor5/34.2.0/classic/ckeditor.js"></script>
   </head>
   <body>
     @include('admin.header')
@@ -50,13 +55,18 @@
                     </div>
 
                     <div>
+                        <label>Giảm giá</label>
+                        <input type="number" name="discount" id="discount" step="0.01" min="0" value="{{ $data->discount }}">
+                    </div>
+
+                    <div>
                         <label>Số lượng</label>
                         <input type="number" name="quantity" value="{{ $data->quantity }}">
                     </div>
 
                     <div>
                         <label>Mô tả</label>
-                        <textarea name="description">{{ $data->description }}</textarea>
+                        <textarea name="description" id="description">{!! $data->description !!}</textarea>
                     </div>
 
                     <div>
@@ -82,6 +92,18 @@
           </div>
       </div>
     </div>
+    <!-- Khởi tạo CKEditor 5 -->
+    <script>
+        ClassicEditor
+            .create(document.querySelector('#description'), {
+                ckfinder: {
+                    uploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+                }
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    </script>
     <!-- JavaScript files-->
     <script src="{{ asset('admincss/vendor/jquery/jquery.min.js') }}"></script>
     <script src="{{ asset('admincss/vendor/popper.js/umd/popper.min.js') }}"> </script>

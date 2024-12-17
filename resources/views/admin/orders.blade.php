@@ -25,14 +25,7 @@
           text-align: center;
           color: white;
         }
-        input[type="search"]{
-          width: 300px;
-          height: 39px;
-          border-radius: 5px;
-          border: 1px solid #007bff;
-          padding: 5px;
-          margin-top: 20px;
-        }
+        
         .status-pending{
           background-color: orange;
           color: white;
@@ -103,12 +96,12 @@
     <div class="page-content">
       <div class="page-header">
         <div class="container-fluid">
-
-          <form action="{{ route('admin.searchOrder') }}" method="GET">
-            <input type="search" name="search" placeholder="Tìm kiếm đơn hàng">
-            <input type="submit" class="btn btn-success" value="Tìm kiếm">
+          <nav class="navbar navbar-light bg-light">
+          <form class="form-inline" action="{{ route('admin.searchOrder') }}" method="GET">
+            <input class="form-control mr-sm-2" type="search" name="search" placeholder="Tìm kiếm đơn hàng">
+            <input type="submit" class="btn btn-outline-success my-2 my-sm-0" value="Tìm kiếm">
         </form>
-
+        </nav>
           <form action="{{ route('admin.orders') }}" method="GET">
             <div class="form-group">
                 <label for="status" class="font-weight-bold">Trạng thái đơn hàng</label>

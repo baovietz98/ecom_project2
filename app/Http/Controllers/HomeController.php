@@ -10,8 +10,12 @@ use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\Feedback;
 use App\Models\News;
+use App\Models\Category;
+use App\Models\Brand;
+use App\Mail\OrderPlaced;
 use Stripe;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 
 class HomeController extends Controller
@@ -58,7 +62,12 @@ class HomeController extends Controller
     public function product_details($id)
     {
         // Lấy sản phẩm từ bảng 'products' kèm theo hình ảnh với id trùng với tham số truyền vào
-        $product = Product::with('images')->find($id);
+        $product = Product::with(['images', 'category'])->findOrFail($id);
+        // Lấy các sản phẩm gợi ý từ cùng danh mục, loại trừ sản phẩm hiện tại
+        $relatedProducts = Product::where('category_id', $product->category_id)
+        ->where('id', '!=', $product->id)
+        ->limit(4) // Giới hạn số lượng sản phẩm gợi ý
+        ->get();
         if (Auth::id()){
             $user = Auth::user();
             $user_id = $user->id;
@@ -68,9 +77,15 @@ class HomeController extends Controller
         else{
             $count = '';
         }
+         // Tạo breadcrumb
+        $breadcrumbs = [
+        ['name' => 'Home', 'url' => route('home')], // Trang chủ
+        ['name' => $product->category->name, 'url' => route('category.show', $product->category->name)], // Danh mục
+        ['name' => $product->title, 'url' => null], // Sản phẩm (không có link)
+         ];
         
         // Truyền biến 'product' vào view 'home.product_details'
-        return view('home.product_details', compact('product','count'));
+        return view('home.product_details', compact('product','relatedProducts','count','breadcrumbs'));
     }
 
     public function add_cart($id){
@@ -169,13 +184,15 @@ class HomeController extends Controller
         if ($product) {
             // Kiểm tra xem số lượng trong kho có đủ để đáp ứng đơn hàng không
             if ($product->quantity >= $item->quantity) {
+                // Tính giá sau khi giảm nếu có giảm giá
+                $priceAfterDiscount = $product->discount > 0 ? $product->price * (1 - $product->discount) : $product->price;
                 // Tạo chi tiết đơn hàng
                 $orderDetail = new OrderDetail();
                 $orderDetail->order_id = $order->id; // Liên kết với đơn hàng
                 $orderDetail->product_id = $item->product_id; // ID sản phẩm
                 $orderDetail->price = $product->price; // Giá sản phẩm
                 $orderDetail->num = $item->quantity; // Số lượng
-                $orderDetail->total_money = $product->price * $item->quantity; // Tính tổng tiền cho sản phẩm
+                $orderDetail->total_money = $priceAfterDiscount * $item->quantity; // Tính tổng tiền cho sản phẩm
                 $orderDetail->save(); // Lưu chi tiết đơn hàng vào database
 
                 // Cập nhật số lượng sản phẩm sau khi khách hàng mua
@@ -195,6 +212,13 @@ class HomeController extends Controller
     $order->total_money = $totalMoney;
     $order->save(); // Lưu lại thông tin đơn hàng với tổng tiền
 
+    // Sau khi lưu đơn hàng
+    $order->load('user');
+
+
+    // Gửi email xác nhận đơn hàng
+    Mail::to($order->user->email)->send(new OrderPlaced($order));
+
     // Xóa giỏ hàng sau khi đặt hàng thành công
     Cart::where('user_id', Auth::id())->delete(); // Xóa tất cả sản phẩm trong giỏ hàng của người dùng
 
@@ -209,7 +233,7 @@ class HomeController extends Controller
         /// Lấy tất cả đơn hàng của người dùng, sắp xếp theo ngày đặt giảm dần và phân trang
         $orders = Order::where('user_id', Auth::id())
         ->with('orderDetails.product')
-        ->orderBy('order_date', 'desc')
+        ->orderBy('id', 'desc')
         ->paginate(5);
         
         // Kiểm tra người dùng đã đăng nhập chưa và lấy số lượng sản phẩm trong giỏ hàng
@@ -218,9 +242,13 @@ class HomeController extends Controller
             $user_id = Auth::id();
             $count = Cart::where('user_id', $user_id)->sum('quantity');
         }
+        $breadcrumbs = [
+            ['name' => 'Home', 'url' => route('home')],
+            ['name' => 'Lịch sử đặt hàng', 'url' => route('my.orders')],
+        ];
     
         // Truyền biến $orders và $count vào view
-        return view('home.orders', compact('orders', 'count'));
+        return view('home.orders', compact('orders', 'count','breadcrumbs'));
     }
     public function orderDetails($id)
     {
@@ -233,9 +261,14 @@ class HomeController extends Controller
             $user_id = Auth::id();
             $count = Cart::where('user_id', $user_id)->sum('quantity');
         }
+        $breadcrumbs = [
+            ['name' => 'Home', 'url' => route('home')],
+            ['name' => 'Lịch sử đặt hàng', 'url' => route('my.orders')],
+            ['name' => 'Chi tiết đơn hàng', 'url' => null], // Không có URL (không nhấn được)
+        ];
     
         // Truyền biến $order và $count vào view
-        return view('home.order_detail', compact('order', 'count'));
+        return view('home.order_detail', compact('order', 'count','breadcrumbs'));
     }
     public function shop()
     {
@@ -249,9 +282,13 @@ class HomeController extends Controller
         } else {
             $count = 0;  // Nếu chưa đăng nhập thì giỏ hàng là 0
         }
+        $breadcrumbs = [
+            ['name' => 'Home', 'url' => route('home')],
+            ['name' => 'Shop', 'url' => route('shop')],
+        ];
     
         // Truyền biến 'products' và 'count' vào view 'home.index'
-        return view('home.shop', compact('products', 'count'));
+        return view('home.shop', compact('products', 'count','breadcrumbs'));
     }
 
     public function whyUs()
@@ -263,9 +300,13 @@ class HomeController extends Controller
         } else {
             $count = 0;  // Nếu chưa đăng nhập thì giỏ hàng là 0
         }
+        $breadcrumbs = [
+            ['name' => 'Home', 'url' => route('home')],
+            ['name' => 'Why us', 'url' => route('why-us')],
+        ];
     
         // Truyền biến 'count' vào view 'home.why-us'
-        return view('home.why', compact('count'));
+        return view('home.why', compact('count','breadcrumbs'));
     }
     
     public function feedback()
@@ -277,9 +318,13 @@ class HomeController extends Controller
         } else {
             $count = 0;  // Nếu chưa đăng nhập thì giỏ hàng là 0
         }
+        $breadcrumbs = [
+            ['name' => 'Home', 'url' => route('home')],
+            ['name' => 'Chăm sóc khách hàng', 'url' => route('feedback')],
+        ];
     
         // Truyền biến 'count' vào view 'home.feedback'
-        return view('home.feedback', compact('count'));
+        return view('home.feedback', compact('count','breadcrumbs'));
     }
     
     public function store(Request $request)
@@ -359,13 +404,15 @@ class HomeController extends Controller
                 if ($product) {
                     // Kiểm tra xem số lượng trong kho có đủ để đáp ứng đơn hàng không
                     if ($product->quantity >= $item->quantity) {
+                        // Tính giá sau khi giảm nếu có giảm giá
+                        $priceAfterDiscount = $product->discount > 0 ? $product->price * (1 - $product->discount) : $product->price;
                         // Tạo chi tiết đơn hàng
                         $orderDetail = new OrderDetail();
                         $orderDetail->order_id = $order->id; // Liên kết với đơn hàng
                         $orderDetail->product_id = $item->product_id; // ID sản phẩm
                         $orderDetail->price = $product->price; // Giá sản phẩm
                         $orderDetail->num = $item->quantity; // Số lượng
-                        $orderDetail->total_money = $product->price * $item->quantity; // Tính tổng tiền cho sản phẩm
+                        $orderDetail->total_money = $priceAfterDiscount * $item->quantity; // Tính tổng tiền cho sản phẩm
                         $orderDetail->save(); // Lưu chi tiết đơn hàng vào database
     
                         // Cập nhật số lượng sản phẩm sau khi khách hàng mua
@@ -384,6 +431,14 @@ class HomeController extends Controller
             // Cập nhật tổng tiền cho đơn hàng
             $order->total_money = $totalMoney;
             $order->save(); // Lưu lại thông tin đơn hàng
+
+            // Sau khi lưu đơn hàng
+            $order->load('user');
+
+
+             // Gửi email xác nhận đơn hàng
+             Mail::to($order->user->email)->send(new OrderPlaced($order));
+            
     
             // Xóa giỏ hàng của người dùng sau khi đặt hàng thành công
             Cart::where('user_id', Auth::id())->delete();
@@ -400,5 +455,101 @@ class HomeController extends Controller
             return back();
         }
     }
+
+    public function show($name, Request $request)
+    {
+        /// Tìm danh mục theo name
+    $category = Category::where('name', $name)->firstOrFail();
+
+    // Lấy danh sách các hãng
+    $brands = Brand::all();
+
+    // Lấy sản phẩm theo danh mục
+    $products = Product::where('category_id', $category->id);
+    if (Auth::check()) {
+        $user_id = Auth::id();
+        $count = Cart::where('user_id', $user_id)->sum('quantity');
+    } else {
+        $count = 0; // Nếu chưa đăng nhập thì giỏ hàng là 0
+    }
+
+    // Chỉ lọc theo hãng nếu tham số 'brand' có giá trị
+    // Tạo breadcrumb
+    $breadcrumbs = [
+        ['name' => 'Home', 'url' => route('home')],
+        ['name' => $category->name, 'url' => route('category.show', $category->name)],
+    ];
+    if ($request->filled('brand')) {
+        $products = $products->where('brand_id', $request->brand);
+    }
+
+    $products = $products->paginate(12); // Phân trang sản phẩm
+
+    return view('home.category_show', compact('category', 'products', 'brands','count','breadcrumbs'));
+    }
+
+    public function cancelOrder($id)
+    {
+        $order = Order::with('orderDetails')->where('id', $id)->where('user_id', Auth::id())->first();
+
+        if (!$order) {
+            return redirect()->back()->with('error', 'Đơn hàng không tồn tại hoặc bạn không có quyền hủy đơn hàng này.');
+        }
+
+        // Kiểm tra trạng thái đơn hàng
+        if ($order->status === 'completed') {
+            return redirect()->back()->with('error', 'Đơn hàng đã hoàn tất và không thể hủy.');
+        }
+
+        // cập nhật lại số lượng trong kho khi hủy đơn hàng
+        foreach ($order->orderDetails as $detail) {
+            $product = $detail->product; // Lấy sản phẩm từ mối quan hệ
+            if ($product) {
+                $product->quantity += $detail->num; // Cập nhật lại số lượng
+                $product->save(); // Lưu vào cơ sở dữ liệu
+            }
+        }
+
+        // Xóa chi tiết đơn hàng
+        foreach ($order->orderDetails as $detail) {
+            $detail->delete();
+        }
+
+        // Xóa đơn hàng
+        $order->delete();
+        toastr()->success('Đơn hàng đã được hủy thành công.');
+
+        return redirect()->route('my.orders');
+    }
+
+    public function search_results(Request $request)
+{
+    $search = $request->input('search');
+
+    // Tìm kiếm sản phẩm theo title hoặc description hoặc mã sản phẩm
+    $products = Product::with(['images', 'category'])
+    ->where(function($query) use ($search) {
+        $query->where('title', 'like', '%' . $search . '%')
+              ->orWhere('description', 'like', '%' . $search . '%')
+              ->orWhere('product_code', 'like', '%' . $search . '%');
+    })
+    ->paginate(12);
+    // Kiểm tra đăng nhập để lấy số lượng sản phẩm trong giỏ hàng
+    if (Auth::check()) {
+        $user_id = Auth::id();
+        $count = Cart::where('user_id', $user_id)->sum('quantity');
+    } else {
+        $count = 0;
+    }
+
+    // Tạo breadcrumbs
+    $breadcrumbs = [
+        ['name' => 'Home', 'url' => route('home')],
+        ['name' => 'Kết quả tìm kiếm', 'url' => null],
+    ];
+
+    // Truyền biến 'products' vào view 'home.search_results'
+    return view('home.search_results', compact('products', 'search', 'count', 'breadcrumbs'));
+}
 
 }

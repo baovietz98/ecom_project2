@@ -9,7 +9,7 @@
         <span class=""></span>
       </button>
 
-      <div class="collapse navbar-collapse" id="navbarSupportedContent" style="background-color: #EEEEEE">
+      <div class="collapse navbar-collapse" id="navbarSupportedContent" style="background-color: #E3F2FD;">
         <ul class="navbar-nav  ">
           <li class="nav-item active">
             <a class="nav-link" href="{{ route('home') }}">Home <span class="sr-only">(current)</span></a>
@@ -70,16 +70,4 @@
       </div>
     </nav>
   </header>
-  <style>
-    .nav-item a {
-        color: #000; /* Màu chữ ban đầu */
-        padding: 10px;
-        transition: background-color 0.3s ease, color 0.3s ease; /* Hiệu ứng chuyển */
-    }
-
-    .nav-item a:hover {
-        background-color: white; /* Màu nền khi hover */
-        color: #fff; /* Màu chữ khi hover */
-        border-radius: 5px; /* Làm góc tròn */
-    }
-</style>
+  
